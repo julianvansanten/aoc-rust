@@ -89,6 +89,9 @@ fn write_to_file(year: i32, day: u32, input: &String) -> Result<String, &'static
 /// Try to get the input from a file, otherwise pull it from AdventOfCode.com
 /// Store the result locally
 pub fn get_input_and_store(year: i32, day: u32) -> Result<String, &'static str> {
+    if !validate_date(year, day) {
+        return Err("Invalid puzzle year or day!");
+    }
     let input: String = match get_input_from_file(year, day) {
         Ok(res) => res,
         Err(_) => {
