@@ -2,28 +2,11 @@ use regex::Regex;
 use std::env;
 
 mod aoc_lib;
+mod sols;
 
 use aoc_lib::validate_date;
 
 use crate::aoc_lib::get_input_and_store;
-
-struct Selector {
-    year: i32,
-    day: u32,
-    puzzle2: bool,
-}
-
-fn build_exercise_selector(args: Vec<String>) -> Selector {
-    let mut selector = Selector {
-        year: 0,
-        day: 0,
-        puzzle2: false,
-    };
-    let reg = Regex::new("").unwrap();
-    while !validate_date(selector.year, selector.day) {}
-
-    selector
-}
 
 fn main() {
     // Which year?

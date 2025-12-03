@@ -20,7 +20,7 @@ pub fn validate_date(year: i32, day: u32) -> bool {
     if year < current_year {
         return 1 <= day && day <= 12;
     }
-    return day >= 1 && day <= current_day;
+    return day >= 1 && day <= current_day && day <= 12;
 }
 
 /// Pull the puzzle input from advent of code with a given string
@@ -59,12 +59,12 @@ fn get_input_from_file(year: i32, day: u32) -> Result<String, &'static str> {
     if !validate_date(year, day) {
         return Err("Year or day invalid!")
     }
-    let content = fs::read_to_string(format!("./{FOLDER_NAME}/{year}/{day}.txt"));
+    let content = fs::read_to_string(format!("./{FOLDER_NAME}/{year}/input/{day}.txt"));
     content.map_err(|_| "Unable to read puzzle input for year {year} and day {day}!")
 }
 
 fn write_to_file(year: i32, day: u32, input: &String) -> Result<String, &'static str> {
-    let path = format!("./{FOLDER_NAME}/{year}/{day}.txt");
+    let path = format!("./{FOLDER_NAME}/{year}/input/{day}.txt");
     let exists: bool;
     match fs::exists(&path) {
         Ok(res) => exists = res,
