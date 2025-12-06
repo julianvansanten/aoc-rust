@@ -127,6 +127,7 @@ pub fn get_test_and_store(year: i32, day: u32) -> Result<String, &'static str> {
             io::stdin()
                 .read_to_string(&mut input)
                 .map_err(|_| "Failed to read from stdin")?;
+            input = String::from(input.as_str().trim());
             match write_to_file(year, day, &input, true) {
                 Ok(_) => (),
                 Err(_) => eprintln!("Failed to write test to file! Continuing..."),
