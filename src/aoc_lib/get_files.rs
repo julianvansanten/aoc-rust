@@ -1,11 +1,13 @@
-use std::env;
+use std::{env, io::{self, Read}};
 
-use dotenv::dotenv;
-use std::{fs, path::Path};
-use reqwest::{blocking as req, header::COOKIE};
 use chrono::{self, Datelike, Utc};
+use dotenv::dotenv;
+use reqwest::{blocking as req, header::COOKIE};
+use std::{fs, path::Path};
 
 const FOLDER_NAME: &str = "puzzle_input";
+const PUZZLE_INPUT: &str = "input";
+const PUZZLE_TEST: &str = "test";
 
 /// Validate a year and a day for the puzzle
 pub fn validate_date(year: i32, day: u32) -> bool {
@@ -24,17 +26,13 @@ pub fn validate_date(year: i32, day: u32) -> bool {
 }
 
 /// Pull the puzzle input from advent of code with a given string
-fn get_input_from_aoc(
-    cookie: &String,
-    year: i32,
-    day: u32,
-) -> Result<String, &'static str> {
+fn get_input_from_aoc(cookie: &String, year: i32, day: u32) -> Result<String, &'static str> {
     if cookie.len() != 128 {
-        return Err("Cookie is invalid!")
+        return Err("Cookie is invalid!");
     }
 
     if !validate_date(year, day) {
-        return Err("Year or day invalid!")
+        return Err("Year or day invalid!");
     }
 
     let client = req::Client::new();
@@ -55,28 +53,39 @@ fn get_cookie_from_env() -> Result<String, env::VarError> {
 }
 
 /// Try to read input from an existing file
-fn get_input_from_file(year: i32, day: u32) -> Result<String, &'static str> {
+fn get_input_from_file(year: i32, day: u32, is_test: bool) -> Result<String, &'static str> {
     if !validate_date(year, day) {
-        return Err("Year or day invalid!")
+        return Err("Year or day invalid!");
     }
-    let content = fs::read_to_string(format!("./{FOLDER_NAME}/{year}/input/{day}.txt"));
+    let content = fs::read_to_string(format!(
+        "./{FOLDER_NAME}/{year}/{}/{day}.txt",
+        if is_test { PUZZLE_TEST } else { PUZZLE_INPUT }
+    ));
     content.map_err(|_| "Unable to read puzzle input for year {year} and day {day}!")
 }
 
-fn write_to_file(year: i32, day: u32, input: &String) -> Result<String, &'static str> {
-    let path = format!("./{FOLDER_NAME}/{year}/input/{day}.txt");
+fn write_to_file(
+    year: i32,
+    day: u32,
+    input: &String,
+    is_test: bool,
+) -> Result<String, &'static str> {
+    let path = format!(
+        "./{FOLDER_NAME}/{year}/{}/{day}.txt",
+        if is_test { PUZZLE_TEST } else { PUZZLE_INPUT }
+    );
     let exists: bool;
     match fs::exists(&path) {
         Ok(res) => exists = res,
         Err(_) => exists = false,
     }
     if exists {
-        return get_input_from_file(year, day);
+        return get_input_from_file(year, day, is_test);
     }
     // Recursively create all parent directories
     if let Some(parent) = Path::new(&path).parent() {
         match fs::create_dir_all(parent) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(_) => return Err("Could not create extra folders!"),
         }
     }
@@ -92,7 +101,7 @@ pub fn get_input_and_store(year: i32, day: u32) -> Result<String, &'static str> 
     if !validate_date(year, day) {
         return Err("Invalid puzzle year or day!");
     }
-    let input: String = match get_input_from_file(year, day) {
+    let input: String = match get_input_from_file(year, day, false) {
         Ok(res) => res,
         Err(_) => {
             let cookie = match get_cookie_from_env() {
@@ -103,9 +112,28 @@ pub fn get_input_and_store(year: i32, day: u32) -> Result<String, &'static str> 
                 Ok(res) => res,
                 Err(_) => return Err("Unable to make request"),
             }
-        },
+        }
     };
-    write_to_file(year, day, &input)
+    write_to_file(year, day, &input, false)
+}
+
+/// Try to get the test data from a file, otherwise ask the user to paste the input
+pub fn get_test_and_store(year: i32, day: u32) -> Result<String, &'static str> {
+    match get_input_from_file(year, day, true) {
+        Ok(res) => Ok(res),
+        Err(_) => {
+            println!("Paste test input (Ctrl+D to finish):");
+            let mut input = String::new();
+            io::stdin()
+                .read_to_string(&mut input)
+                .map_err(|_| "Failed to read from stdin")?;
+            match write_to_file(year, day, &input, true) {
+                Ok(_) => (),
+                Err(_) => eprintln!("Failed to write test to file! Continuing..."),
+            }
+            Ok(input)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -117,12 +145,12 @@ mod test {
     #[test]
     fn test_write_to_file() {
         let input = String::from("Test\ninput");
-        let result = write_to_file(2015, 1, &input);
+        let result = write_to_file(2015, 1, &input, false);
         match result {
             Ok(text) => assert_eq!(input, text),
             Err(err) => panic!("{}", err),
         }
-        let second_result = write_to_file(2015, 1, &input);
+        let second_result = write_to_file(2015, 1, &input, false);
         match second_result {
             Ok(text) => assert_eq!(input, text),
             Err(err) => panic!("{}", err),
