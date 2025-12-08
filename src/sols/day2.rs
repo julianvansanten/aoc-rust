@@ -15,7 +15,9 @@ fn is_invalid_id_middle(number: &String) -> bool {
 
 fn is_invalid_id_repeat(number: &String) -> bool {
     for slice in 1..(number.len() / 2 + 1) {
-        if number.as_bytes().chunks(slice).all_equal() {
+        if number.chars()
+                .collect::<Vec<_>>()
+                .chunks(slice).all_equal() {
             return true;
         }
     }
@@ -64,14 +66,37 @@ mod tests {
 
         assert_eq!(solver(input.as_str(), is_invalid_id_middle), 1227775554);
     }
+    
+    #[test]
+    fn test_is_invalid_id_repeat() {
+        assert!(is_invalid_id_repeat(&String::from("11")));
+        assert!(is_invalid_id_repeat(&String::from("22")));
+        assert!(is_invalid_id_repeat(&String::from("99")));
+        assert!(is_invalid_id_repeat(&String::from("111")));
+        assert!(is_invalid_id_repeat(&String::from("999")));
+        assert!(is_invalid_id_repeat(&String::from("1010")));
+        assert!(is_invalid_id_repeat(&String::from("1188511885")));
+        assert!(is_invalid_id_repeat(&String::from("222222")));
+        assert!(is_invalid_id_repeat(&String::from("446446")));
+        assert!(is_invalid_id_repeat(&String::from("38593859")));
+        assert!(is_invalid_id_repeat(&String::from("565656")));
+        assert!(is_invalid_id_repeat(&String::from("824824824")));
+        assert!(is_invalid_id_repeat(&String::from("2121212121")));
+        assert!(!is_invalid_id_repeat(&String::from("2121222121")));
+    }
 
     #[test]
     fn test_solve2() {
-        let input = match aoc_lib::get_test_and_store(2025, 2) {
+        let mut input = match aoc_lib::get_test_and_store(2025, 2) {
             Ok(text) => text,
             Err(_) => panic!("Unable to get test input!"),
         };
-
+        
+        input.push_str(",565653-565659");
+        input.push_str(",824824821-824824827");
+        input.push_str(",2121212118-2121212124");
+        
+        
         assert_eq!(solver(input.as_str(), is_invalid_id_repeat), 4174379265);
     }
 }
