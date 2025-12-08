@@ -4,6 +4,7 @@ mod aoc_lib;
 mod sols;
 
 use crate::sols::day1;
+use crate::sols::day2;
 
 const YEAR: i32 = 2025;
 
@@ -43,6 +44,7 @@ fn main() {
     let solvers: HashMap<u32, fn(&str) -> (i64, i64)> = {
         let mut m: HashMap<u32, fn(&str) -> (i64, i64)> = HashMap::new();
         m.insert(1, day1::solve);
+        m.insert(2, day2::solve);
         m
     };
 

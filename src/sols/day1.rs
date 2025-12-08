@@ -47,8 +47,8 @@ fn solve2(input: &str) -> i64 {
         .lines()
         .map(get_num)
         .scan((50, 0, 0), |(acc, zeros, click), x| {
-            *click += (*acc + x.abs()).abs() / 100;
             *acc = (*acc + x).rem_euclid(100);
+            *click += (*acc + x.abs()) / 100;
             if (*acc) == 0 {
                 *click -= 1;
                 *zeros += 1;
@@ -68,7 +68,7 @@ pub fn solve(input: &str) -> (i64, i64) {
 mod tests {
     use super::*;
 
-    use super::super::super::aoc_lib;
+    use crate:: aoc_lib;
 
     #[test]
     fn test_get_num() {
@@ -94,6 +94,7 @@ mod tests {
             Ok(i) => i,
             Err(_) => panic!("Cannot read input!"),
         };
+        println!("Testing input:\n{}", input);
         assert_eq!(solve2(input.as_str()), 6)
     }
 }
