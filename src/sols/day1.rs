@@ -1,5 +1,3 @@
-use std::result;
-
 /// Return the number for a given input string
 fn get_num(input: &str) -> i64 {
     if input.contains("L") {

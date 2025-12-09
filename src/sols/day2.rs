@@ -87,15 +87,10 @@ mod tests {
 
     #[test]
     fn test_solve2() {
-        let mut input = match aoc_lib::get_test_and_store(2025, 2) {
+        let input = match aoc_lib::get_test_and_store(2025, 2) {
             Ok(text) => text,
             Err(_) => panic!("Unable to get test input!"),
         };
-        
-        input.push_str(",565653-565659");
-        input.push_str(",824824821-824824827");
-        input.push_str(",2121212118-2121212124");
-        
         
         assert_eq!(solver(input.as_str(), is_invalid_id_repeat), 4174379265);
     }

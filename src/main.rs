@@ -5,6 +5,7 @@ mod sols;
 
 use crate::sols::day1;
 use crate::sols::day2;
+use crate::sols::day3;
 
 const YEAR: i32 = 2025;
 
@@ -45,6 +46,7 @@ fn main() {
         let mut m: HashMap<u32, fn(&str) -> (i64, i64)> = HashMap::new();
         m.insert(1, day1::solve);
         m.insert(2, day2::solve);
+        m.insert(3, day3::solve);
         m
     };
 
@@ -63,7 +65,7 @@ fn main() {
             exit(1);
         }
     };
-    
+
     if args.len() > 2 {
         match args[2].as_str() {
             "-t" => get_test_and_solve(day_to_run, solver),
