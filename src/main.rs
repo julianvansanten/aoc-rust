@@ -6,6 +6,7 @@ mod sols;
 use crate::sols::day1;
 use crate::sols::day2;
 use crate::sols::day3;
+use crate::sols::day4;
 
 const YEAR: i32 = 2025;
 
@@ -47,6 +48,7 @@ fn main() {
         m.insert(1, day1::solve);
         m.insert(2, day2::solve);
         m.insert(3, day3::solve);
+        m.insert(4, day4::solve);
         m
     };
 

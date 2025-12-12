@@ -1,3 +1,5 @@
+use std::panic;
+
 /// Return the number for a given input string
 fn get_num(input: &str) -> i64 {
     if input.contains("L") {
@@ -23,39 +25,23 @@ fn solve1(input: &str) -> i64 {
 }
 
 fn solve2(input: &str) -> i64 {
-    // match input
-    //     .lines()
-    //     .map(get_num)
-    //     .scan((50, 0, 0), |(acc, zeros, click), x| {
-    //         *click += (*acc + x).abs() / 100;
-    //         *acc = (*acc + x).rem_euclid(100);
-    //         if (*acc) == 0 {
-    //             *click -= 1;
-    //             *zeros += 1;
-    //         }
-    //         Some((*acc, *zeros, *click))
-    //     })
-    //     .last()
-    // {
-    //     Some((_, zeros, clicks)) => zeros + clicks,
-    //     None => 0,
-    // }
-
     match input
         .lines()
         .map(get_num)
-        .scan((50, 0, 0), |(acc, zeros, click), x| {
-            *acc = (*acc + x).rem_euclid(100);
-            *click += (*acc + x.abs()) / 100;
-            if (*acc) == 0 {
-                *click -= 1;
-                *zeros += 1;
+        .scan((50, 0), |(acc, clicks), x| {
+            let next = (*acc + x).rem_euclid(100);
+            *clicks = *clicks + ((*acc + x).abs() / 100);
+            if (*acc != 0 && (*acc + x) < 0) || (next == 0 && (*acc + x).abs() < 100) {
+                *clicks += 1;
             }
-            Some((*acc, *zeros, *click))
-        }).last() {
-            Some((_, z, c)) => z + c,
-            None => 0,
-        }
+            *acc = next;
+            Some((*acc, *clicks))
+        })
+        .last()
+    {
+        Some((_, clicks)) => clicks,
+        None => panic!("Failure!"),
+    }
 }
 
 pub fn solve(input: &str) -> (i64, i64) {
@@ -66,7 +52,7 @@ pub fn solve(input: &str) -> (i64, i64) {
 mod tests {
     use super::*;
 
-    use crate:: aoc_lib;
+    use crate::aoc_lib;
 
     #[test]
     fn test_get_num() {
@@ -83,7 +69,7 @@ mod tests {
             Ok(i) => i,
             Err(_) => panic!("Cannot read input!"),
         };
-        assert_eq!(solve1(input.as_str()), 3)
+        assert_eq!(solve1(input.as_str()), 3);
     }
 
     #[test]
@@ -93,6 +79,6 @@ mod tests {
             Err(_) => panic!("Cannot read input!"),
         };
         println!("Testing input:\n{}", input);
-        assert_eq!(solve2(input.as_str()), 6)
+        assert_eq!(solve2(input.as_str()), 6);
     }
 }
