@@ -3,7 +3,7 @@ use std::{collections::HashMap, env, process::exit};
 mod aoc_lib;
 mod sols;
 
-use crate::sols::{day1, day2, day3, day4, day5};
+use crate::sols::{day1, day2, day3, day4, day5, day6};
 
 const YEAR: i32 = 2025;
 
@@ -47,6 +47,7 @@ fn main() {
         m.insert(3, day3::solve);
         m.insert(4, day4::solve);
         m.insert(5, day5::solve);
+        m.insert(6, day6::solve);
         m
     };
 

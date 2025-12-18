@@ -1,9 +1,9 @@
 use std::{
-    collections::{BTreeSet, HashSet},
     fmt::Display,
     process::exit,
 };
 
+use itertools::Itertools;
 use nom::{
     IResult, Parser,
     bytes::complete::tag,
@@ -31,6 +31,22 @@ impl Display for Range {
     }
 }
 
+impl PartialOrd for Range {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        match self.min.partial_cmp(&other.min) {
+            Some(core::cmp::Ordering::Equal) => {}
+            ord => return ord,
+        }
+        self.max.partial_cmp(&other.max)
+    }
+}
+
+impl Ord for Range {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.min.cmp(&other.min)
+    }
+}
+
 impl Range {
     fn new(min: i64, max: i64) -> Range {
         assert!(min <= max);
@@ -49,14 +65,27 @@ impl Range {
     fn count(&self) -> i64 {
         self.max - self.min + 1
     }
+}
 
-    fn numbers(&self) -> Vec<i64> {
-        let mut res: Vec<i64> = Vec::new();
-        for x in self.min..self.max + 1 {
-            res.push(x);
+fn minimize_ranges(ranges: Vec<Range>) -> Vec<Range> {
+    ranges.iter().sorted().fold(Vec::new(), |list, range| {
+        let mut result: Vec<Range> = list.clone();
+        match result.last() {
+            Some(last) => {
+                match combine(last, range) {
+                    Some(combination) => {
+                        result.pop();
+                        result.push(combination);
+                    },
+                    None => {
+                        result.push(range.clone());
+                    },
+                }
+            },
+            None => result.push(range.clone()),
         }
-        res
-    }
+        result
+    })
 }
 
 fn combine(first: &Range, second: &Range) -> Option<Range> {
@@ -72,14 +101,6 @@ fn combine(first: &Range, second: &Range) -> Option<Range> {
         max = second.max;
     }
     Some(Range::new(min, max))
-}
-
-fn count_numbers(ranges: Vec<Range>) -> i64 {
-    let mut numbers: HashSet<i64> = HashSet::new();
-    for range in ranges {
-        numbers.extend(range.numbers());
-    }
-    numbers.len() as i64
 }
 
 fn parse_range(input: &str) -> IResult<&str, Range> {
@@ -132,7 +153,8 @@ fn solve2(input: &str) -> i64 {
             exit(1);
         }
     };
-    count_numbers(ranges)
+    let ranges = minimize_ranges(ranges);
+    ranges.iter().map(|r| r.count()).sum::<i64>()
 }
 
 pub fn solve(input: &str) -> (i64, i64) {
@@ -166,11 +188,11 @@ mod tests {
     }
 
     #[test]
-    fn test_count_ranges() {
-        let mut ranges: Vec<Range> = Vec::new();
-        ranges.push(Range::new(3, 6));
-        ranges.push(Range::new(5, 8));
-        assert_eq!(count_numbers(ranges), 6);
+    fn test_minimize_ranges() {
+        let ranges = vec![Range::new(1, 2), Range::new(4,7), Range::new(6, 8)];
+        let minimized = minimize_ranges(ranges);
+        assert_eq!(minimized.len(), 2);
+        assert_eq!(minimized.iter().map(|r| r.count()).sum::<i64>(), 7);
     }
 
     #[test]
