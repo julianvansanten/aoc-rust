@@ -139,8 +139,6 @@ pub fn get_test_and_store(year: i32, day: u32) -> Result<String, &'static str> {
 
 #[cfg(test)]
 mod test {
-    use core::panic;
-
     use super::*;
 
     #[test]
@@ -169,8 +167,8 @@ mod test {
         assert!(!validate_date(2015, 0));
         assert!(!validate_date(2015, 26));
 
-        assert!(validate_date(current_year, current_day));
+        assert!(validate_date(current_year, current_day.min(12)));
         assert!(!validate_date(current_year + 1, 1));
-        assert!(!validate_date(current_year, current_day + 1));
+        assert!(!validate_date(current_year, current_day.min(12) + 1));
     }
 }

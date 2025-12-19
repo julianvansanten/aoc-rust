@@ -4,11 +4,12 @@ mod aoc_lib;
 mod sols;
 
 use crate::sols::{day1, day2, day3, day4, day5, day6};
+use crate::aoc_lib::get_files::{get_input_and_store, get_test_and_store};
 
 const YEAR: i32 = 2025;
 
 fn get_input_and_solve(day: u32, solve: &fn(&str) -> (i64, i64)) {
-    let input: String = match aoc_lib::get_input_and_store(YEAR, day) {
+    let input: String = match get_input_and_store(YEAR, day) {
         Ok(input) => input,
         Err(_) => {
             eprintln!("Unable to get input for y{}d{}", YEAR, day);
@@ -20,7 +21,7 @@ fn get_input_and_solve(day: u32, solve: &fn(&str) -> (i64, i64)) {
 }
 
 fn get_test_and_solve(day: u32, solve: &fn(&str) -> (i64, i64)) {
-    let test: String = match aoc_lib::get_test_and_store(YEAR, day) {
+    let test: String = match get_test_and_store(YEAR, day) {
         Ok(test) => test,
         Err(_) => {
             eprintln!("Unable to get test input for y{}d{}", YEAR, day);

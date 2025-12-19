@@ -53,13 +53,13 @@ pub fn solve(input: &str) -> (i64, i64) {
 
 #[cfg(test)]
 mod tests {
-    use crate::aoc_lib;
+    use crate::aoc_lib::get_test_and_store;
 
     use super::*;
 
     #[test]
     fn test_solve1() {
-        let input = match aoc_lib::get_test_and_store(2025, 2) {
+        let input = match get_test_and_store(2025, 2) {
             Ok(text) => text,
             Err(_) => panic!("Unable to get test input!"),
         };
@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn test_solve2() {
-        let input = match aoc_lib::get_test_and_store(2025, 2) {
+        let input = match get_test_and_store(2025, 2) {
             Ok(text) => text,
             Err(_) => panic!("Unable to get test input!"),
         };
